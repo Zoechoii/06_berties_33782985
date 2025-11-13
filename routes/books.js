@@ -2,14 +2,32 @@
 const express = require("express")
 const router = express.Router()
 
-router.get('/search',function(req, res, next){
-    res.render("search.ejs")
+// Display search page
+router.get('/search', function(req, res, next) {
+    res.render('search.ejs', {shopData: {shopName: "Berties Books"}});
 });
 
-router.get('/search-result', function (req, res, next) {
-    //searching in the database
-    res.send("You searched for: " + req.query.keyword)
+// Handle search (advanced search with LIKE)
+router.get('/search-result', function(req, res, next) {
+    let keyword = req.query.keyword;
+    // Advanced search: partial match using LIKE
+    let sqlquery = "SELECT * FROM books WHERE name LIKE ?";
+    let searchTerm = '%' + keyword + '%';
+    
+    console.log("Search keyword:", keyword);
+    console.log("Search term:", searchTerm);
+    console.log("SQL query:", sqlquery);
+    
+    db.query(sqlquery, [searchTerm], (err, result) => {
+        if (err) {
+            console.log("Error:", err);
+            next(err);
+        }
+        console.log("Result:", result);
+        res.render("search-result.ejs", {availableBooks:result});
+    });
 });
+
 
 router.get('/list', function(req, res, next) {
     let sqlquery = "SELECT * FROM books"; // query database to get all the books
@@ -39,6 +57,17 @@ router.post('/bookadded', function (req, res, next) {
         }
         else
             res.send('This book is added to database, name: '+ req.body.name + ' price £'+ req.body.price);
+    });
+});
+
+// Display bargain books (books under £20)
+router.get('/bargainbooks', function(req, res, next) {
+    let sqlquery = "SELECT * FROM books WHERE price < 20";
+    db.query(sqlquery, (err, result) => {
+        if (err) {
+            next(err);
+        }
+        res.render("bargainbooks.ejs", {availableBooks:result});
     });
 });
 
