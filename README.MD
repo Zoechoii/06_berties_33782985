@@ -8,3 +8,9 @@ To install and run:
 
 npm install
 node index.js
+
+## Features
+- View all books
+- Add new books
+- Search for books
+- View bargain books (under £20)
