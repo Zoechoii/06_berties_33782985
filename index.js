@@ -45,3 +45,5 @@ app.use('/books', booksRoutes)
 
 // Start the web app listening
 app.listen(port, () => console.log(`Example app listening on port ${port}!`))
+
+app.use(express.static(__dirname + '/public'));
