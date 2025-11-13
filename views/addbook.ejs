@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Add Book</title>
+</head>
+<body>
+    <h1>Add a new book</h1>
+    <form method="POST" action="/books/bookadded">
+        <p>Book name: <input type="text" name="name" required /></p>
+        <p>Price: <input type="number" name="price" step="0.01" required /></p>
+        <input type="submit" value="Add book" />
+    </form>
+    <br>
+    <a href="/">Home</a>
+</body>
+</html>
