@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Audit Log - <%= shopData.shopName %></title>
+    <link rel="stylesheet" type="text/css" href="/main.css" />
+</head>
+<body>
+    <h1>Login Audit Log</h1>
+    
+    <% if (logs.length > 0) { %>
+        <table border="1" cellpadding="10">
+            <thead>
+                <tr>
+                    <th>Username</th>
+                    <th>Login Time</th>
+                    <th>Success</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% logs.forEach(function(log) { %>
+                    <tr>
+                        <td><%= log.username %></td>
+                        <td><%= log.login_time %></td>
+                        <td><%= log.success ? 'Yes' : 'No' %></td>
+                    </tr>
+                <% }); %>
+            </tbody>
+        </table>
+    <% } else { %>
+        <p>No audit logs found.</p>
+    <% } %>
+    
+    <br>
+    <a href="/">Home</a>
+</body>
+</html>
