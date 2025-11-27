@@ -74,8 +74,8 @@ node index.js
 ### Validation Applied:
 - **Registration form (`/users/register`):**
   - Email: Must be valid email format
-  - Username: Must be 5-20 characters long
-  - Password: Must be at least 8 characters long
+  - Username: Must be 3-20 characters long
+  - Password: Must be at least 5 characters long
   - First name: Required (not empty)
   - Last name: Required (not empty)
 
