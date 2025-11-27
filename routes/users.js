@@ -19,7 +19,8 @@ router.get('/register', function (req, res, next) {
 
 router.post('/registered', 
              [check('email').isEmail(), 
-              check('username').isLength({ min: 5, max: 20})], 
+              check('username').isLength({ min: 5, max: 20}), 
+              check('password').isLength({ min: 8 })], 
              function (req, res, next) {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -39,7 +40,9 @@ router.post('/registered',
             let sqlquery = "INSERT INTO users (username, first_name, last_name, email, hashedPassword) VALUES (?,?,?,?,?)";
             
             let newrecord = [
-                req.body.username, 
+                req.body.username,     
+                req.sanitize(req.body.first),
+                req.sanitize(req.body.last),
                 req.body.first, 
                 req.body.last, 
                 req.body.email, 
@@ -52,7 +55,7 @@ router.post('/registered',
                 }
                 
                 // Display result (for debugging purposes)
-                let resultMessage = 'Hello '+ req.body.first + ' '+ req.body.last +' you are now registered! We will send an email to you at ' + req.body.email;
+                let resultMessage = 'Hello '+ req.sanitize(req.body.first) + ' '+ req.sanitize(req.body.last) +' you are now registered! We will send an email to you at ' + req.body.email;
                 resultMessage += '<br>Your password is: '+ req.body.password +' and your hashed password is: '+ hashedPassword;
                 res.send(resultMessage);
             });
@@ -78,7 +81,15 @@ router.get('/login', function (req, res, next) {
 });
 
 // login processing
-router.post('/loggedin', function (req, res, next) {
+router.post('/loggedin', 
+             [check('username').notEmpty().withMessage('Username is required'),
+              check('password').notEmpty().withMessage('Password is required')],
+             function (req, res, next) {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.redirect('./login');
+    }
+    
     // Find user in database by username
     let sqlquery = "SELECT hashedPassword FROM users WHERE username = ?";
     
@@ -111,7 +122,7 @@ router.post('/loggedin', function (req, res, next) {
             if (compareResult == true) {
                 // Save user session here, when login is successful
                 req.session.userId = req.body.username;
-
+                
                 // Log successful login
                 let auditQuery = "INSERT INTO audit_log (username, success) VALUES (?, ?)";
                 db.query(auditQuery, [req.body.username, true], (err) => {

@@ -1,6 +1,7 @@
 // Create a new router
 const express = require("express")
 const router = express.Router()
+const { check, validationResult } = require('express-validator');
 
 // Display search page
 router.get('/search', function(req, res, next) {
@@ -46,17 +47,25 @@ router.get('/addbook', function(req, res, next) {
 });
 
 // Handle book submission
-router.post('/bookadded', function (req, res, next) {
+router.post('/bookadded', 
+             [check('name').notEmpty().withMessage('Book name is required'),
+              check('price').isFloat({ min: 0 }).withMessage('Price must be a positive number')],
+             function (req, res, next) {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.redirect('./addbook');
+    }
+    
     // saving data in database
     let sqlquery = "INSERT INTO books (name, price) VALUES (?,?)";
     // execute sql query
-    let newrecord = [req.body.name, req.body.price];
+    let newrecord = [req.sanitize(req.body.name), req.body.price];
     db.query(sqlquery, newrecord, (err, result) => {
         if (err) {
             next(err);
         }
         else
-            res.send('This book is added to database, name: '+ req.body.name + ' price £'+ req.body.price);
+            res.send('This book is added to database, name: '+ req.sanitize(req.body.name) + ' price £'+ req.body.price);
     });
 });
 

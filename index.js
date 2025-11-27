@@ -4,6 +4,8 @@ var ejs = require('ejs')
 const path = require('path')
 var mysql = require('mysql2');
 var session = require ('express-session')
+const expressSanitizer = require('express-sanitizer');
+require('dotenv').config();
 
 // Create the express application object
 const app = express()
@@ -14,6 +16,8 @@ app.set('view engine', 'ejs')
 
 // Set up the body parser 
 app.use(express.urlencoded({ extended: true }))
+// Create an input sanitizer
+app.use(expressSanitizer());
 // Create a session
 app.use(session({
     secret: 'somerandomstuff',
@@ -31,14 +35,15 @@ app.use(express.static(path.join(__dirname, 'public')))
 app.locals.shopData = {shopName: "Bertie's Books"}
 
 const db = mysql.createPool({
-    host: 'localhost',
-    user: 'berties_books_app',
-    password: 'qwertyuiop',
-    database: 'berties_books',
+    host: process.env.BB_HOST,
+    user: process.env.BB_USER,
+    password: process.env.BB_PASSWORD,
+    database: process.env.BB_DATABASE,
     waitForConnections: true,
     connectionLimit: 10,
     queueLimit: 0,
 });
+
 global.db = db;
 
 // Load the route handlers
