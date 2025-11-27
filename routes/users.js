@@ -4,6 +4,14 @@ const router = express.Router()
 const bcrypt = require('bcrypt')
 const saltRounds = 10
 
+const redirectlogin = (req, res, next) => {
+    if (!req.session.userId ) {
+      res.redirect('./login') // redirect to the login page
+    } else { 
+        next (); // move to the next middleware function
+    } 
+}
+
 router.get('/register', function (req, res, next) {
     res.render('register.ejs')
 })
@@ -42,7 +50,7 @@ router.post('/registered', function (req, res, next) {
     });
 });
 
-router.get('/list', function(req, res, next) {
+router.get('/list', redirectlogin, function(req, res, next) {
     // Select all users but exclude passwords
     let sqlquery = "SELECT username, first_name, last_name, email FROM users";
     
@@ -91,6 +99,9 @@ router.post('/loggedin', function (req, res, next) {
             }
             
             if (compareResult == true) {
+                // Save user session here, when login is successful
+                req.session.userId = req.body.username;
+
                 // Log successful login
                 let auditQuery = "INSERT INTO audit_log (username, success) VALUES (?, ?)";
                 db.query(auditQuery, [req.body.username, true], (err) => {
@@ -112,7 +123,7 @@ router.post('/loggedin', function (req, res, next) {
     });
 });
 
-router.get('/audit', function(req, res, next) {
+router.get('/audit',  redirectlogin, function(req, res, next) {
     // Get all audit logs ordered by most recent first
     let sqlquery = "SELECT username, login_time, success FROM audit_log ORDER BY login_time DESC";
     
