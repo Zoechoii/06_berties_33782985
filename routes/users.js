@@ -18,47 +18,53 @@ router.get('/register', function (req, res, next) {
 })
 
 router.post('/registered', 
-             [check('email').isEmail(), 
-              check('username').isLength({ min: 3, max: 20}), 
-              check('password').isLength({ min: 5 })], 
-             function (req, res, next) {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-        res.render('./register')
-    }
-    else { 
-        // Get plain password from form
-        const plainPassword = req.body.password;
-        
-        // Hash password with bcrypt
-        bcrypt.hash(plainPassword, saltRounds, function(err, hashedPassword) {
-            if (err) {
-                return console.error(err.message);
-            }
-            
-            // Save user data to database !
-            let sqlquery = "INSERT INTO users (username, first_name, last_name, email, hashedPassword) VALUES (?,?,?,?,?)";
-            
-            let newrecord = [
-                req.body.username,     
-                req.sanitize(req.body.first),
-                req.sanitize(req.body.last),
-                req.body.email, 
-                hashedPassword
-            ];
-            
-            db.query(sqlquery, newrecord, (err, result) => {
-                if (err) {
-                    return console.error(err.message);
-                }
-                
-                // Display result (for debugging purposes)
-                let resultMessage = 'Hello '+ req.sanitize(req.body.first) + ' '+ req.sanitize(req.body.last) +' you are now registered! We will send an email to you at ' + req.body.email;
-                resultMessage += '<br>Your password is: '+ req.body.password +' and your hashed password is: '+ hashedPassword;
-                res.send(resultMessage);
-            });
-        });
-    }
+    [check('email').isEmail(), 
+     check('username').isLength({ min: 3, max: 20}), 
+     check('password').isLength({ min: 5 })], 
+    function (req, res, next) {
+const errors = validationResult(req);
+if (!errors.isEmpty()) {
+res.render('./register')
+}
+else { 
+// Get plain password from form
+const plainPassword = req.body.password;
+
+// Hash password with bcrypt
+bcrypt.hash(plainPassword, saltRounds, function(err, hashedPassword) {
+   if (err) {
+       return console.error(err.message);
+   }
+   
+   // Save user data to database
+   let sqlquery = "INSERT INTO users (username, first_name, last_name, email, hashedPassword) VALUES (?,?,?,?,?)";
+   
+   let newrecord = [
+       req.body.username,     
+       req.sanitize(req.body.first),
+       req.sanitize(req.body.last),
+       req.body.email, 
+       hashedPassword
+   ];
+   
+   db.query(sqlquery, newrecord, (err, result) => {
+       if (err) {
+           console.error(err.message);
+           // Check if it's a duplicate username error
+           if (err.code === 'ER_DUP_ENTRY') {
+               return res.send('Registration failed: Username already exists. <a href="/users/register">Try again</a>');
+           }
+           // Other database errors
+           return res.send('Registration failed: Database error. <a href="/users/register">Try again</a>');
+       }
+       
+       // Display result (for debugging purposes)
+       let resultMessage = 'Hello '+ req.sanitize(req.body.first) + ' '+ req.sanitize(req.body.last) +' you are now registered! We will send an email to you at ' + req.body.email;
+       resultMessage += '<br>Your password is: '+ req.body.password +' and your hashed password is: '+ hashedPassword;
+       res.send(resultMessage);
+   });
+});
+}
 });
 
 router.get('/list', redirectlogin, function(req, res, next) {
