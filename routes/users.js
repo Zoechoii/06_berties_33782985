@@ -36,7 +36,7 @@ router.post('/registered',
                 return console.error(err.message);
             }
             
-            // Save user data to database
+            // Save user data to database !
             let sqlquery = "INSERT INTO users (username, first_name, last_name, email, hashedPassword) VALUES (?,?,?,?,?)";
             
             let newrecord = [
