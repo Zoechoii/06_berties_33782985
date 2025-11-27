@@ -43,8 +43,6 @@ router.post('/registered',
                 req.body.username,     
                 req.sanitize(req.body.first),
                 req.sanitize(req.body.last),
-                req.body.first, 
-                req.body.last, 
                 req.body.email, 
                 hashedPassword
             ];
