@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Weather Forecast - <%= shopData.shopName %></title>
+</head>
+<body>
+    <h1>Weather Forecast</h1>
+    <form action="/books/weather-result" method="POST">
+        <label for="city">Enter city name:</label>
+        <input type="text" id="city" name="city" placeholder="e.g., London, Manchester, Seoul" required>
+        <input type="submit" value="Get Weather">
+    </form>
+    <a href="/" class="back-link">← Back to Home</a>
+</body>
+</html>

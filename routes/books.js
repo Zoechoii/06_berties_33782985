@@ -2,6 +2,7 @@
 const express = require("express")
 const router = express.Router()
 const { check, validationResult } = require('express-validator');
+const request = require('request');
 
 // Display search page
 router.get('/search', function(req, res, next) {
@@ -77,6 +78,44 @@ router.get('/bargainbooks', function(req, res, next) {
             next(err);
         }
         res.render("bargainbooks.ejs", {availableBooks:result});
+    });
+});
+
+// show weather form
+router.get('/weather', function(req, res, next) {
+    res.render('weather.ejs');
+});
+
+// get weather data
+router.post('/weather-result', function(req, res, next) {
+    let apiKey = '982023ea8ac3d7388439d3e689c3de37';
+    let city = req.body.city || 'london';
+    let url = `http://api.openweathermap.org/data/2.5/weather?q=${city}&units=metric&appid=${apiKey}`;
+    
+    request(url, function (err, response, body) {
+        if(err) {
+            next(err);
+        } else {
+            var weather = JSON.parse(body);
+            
+            if (weather !== undefined && weather.main !== undefined) {
+                var wmsg = 'It is ' + weather.main.temp + 
+                    ' degrees in ' + weather.name +
+                    '! <br> The humidity now is: ' + 
+                    weather.main.humidity + '%';
+                
+                if (weather.wind !== undefined) {
+                    wmsg += '<br> Wind speed: ' + weather.wind.speed + ' m/s';
+                }
+                if (weather.weather && weather.weather[0]) {
+                    wmsg += '<br> Weather: ' + weather.weather[0].description;
+                }
+                
+                res.send(wmsg);
+            } else {
+                res.send("No data found for this city. Please try again.");
+            }
+        } 
     });
 });
 

@@ -143,3 +143,31 @@ node index.js
 A test user account is available for marking purposes:
 - Username: `gold`
 - Password: `smiths`
+
+## API Documentation
+
+### Get Books
+**Endpoint:** `/api/books`
+
+**Method:** GET
+
+**Query Parameters:**
+- `search` (optional): Search books by name
+  - Example: `/api/books?search=world`
+  
+- `minprice` (optional): Filter books with minimum price
+  - Example: `/api/books?minprice=5`
+  
+- `maxprice` (optional): Filter books with maximum price
+  - Example: `/api/books?maxprice=10`
+  
+- `sort` (optional): Sort results by 'name' or 'price'
+  - Example: `/api/books?sort=name`
+
+**Response:** JSON array of book objects
+
+**Example Requests:**
+- Get all books: `/api/books`
+- Search: `/api/books?search=harry`
+- Price range: `/api/books?minprice=5&maxprice=15`
+- Sort by price: `/api/books?sort=price`

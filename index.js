@@ -5,7 +5,10 @@ const path = require('path')
 var mysql = require('mysql2');
 var session = require ('express-session')
 const expressSanitizer = require('express-sanitizer');
+const request = require('request')
+
 require('dotenv').config();
+
 
 // Create the express application object
 const app = express()
@@ -57,6 +60,10 @@ app.use('/users', usersRoutes)
 // Load the route handlers for /books
 const booksRoutes = require('./routes/books')
 app.use('/books', booksRoutes)
+
+// Load the route handlers for /api
+const apiRoutes = require('./routes/api');
+app.use('/api', apiRoutes);
 
 // Start the web app listening
 app.listen(port, () => console.log(`Example app listening on port ${port}!`))
